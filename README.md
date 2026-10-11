@@ -3,6 +3,8 @@
 Adds Archive and Trash buttons when you hover over a thread in Mailspring's narrow list.
 Tested on Mailspring 1.26.0 for Windows.
 
+![Archive and Trash buttons on hover in the narrow thread list](docs/images/narrow-thread-actions.png)
+
 ## Installation
 
 Run these commands in PowerShell:
