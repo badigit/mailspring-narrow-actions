@@ -6,7 +6,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 const { test } = require('node:test');
 
-function loadPlugin() {
+function loadPlugin({ emptyRegistry = false } = {}) {
   let component;
   let canArchive = true;
   let canTrash = true;
@@ -14,7 +14,8 @@ function loadPlugin() {
   const queued = [];
   const calls = [];
   const originalTimestamp = () => null;
-  const registry = [originalTimestamp];
+  const registry = emptyRegistry ? [] : [originalTimestamp];
+  const listeners = new Set();
   const perspective = {
     canArchiveThreads: () => canArchive,
     canMoveThreadsTo: () => canTrash,
@@ -26,9 +27,16 @@ function loadPlugin() {
       register: (value, options) => {
         assert.equal(options.role, 'ThreadListTimestamp');
         registry.push(value);
-        if (value !== originalTimestamp) component = value;
+        if (value.displayName === 'NarrowThreadTimestampWithActions') component = value;
       },
-      unregister: (value) => { registry.splice(registry.indexOf(value), 1); },
+      unregister: (value) => {
+        const index = registry.indexOf(value);
+        if (index !== -1) registry.splice(index, 1);
+      },
+      listen: (listener) => {
+        listeners.add(listener);
+        return () => listeners.delete(listener);
+      },
     },
     FocusedPerspectiveStore: { current: () => perspective },
     TaskFactory: {
@@ -54,7 +62,8 @@ function loadPlugin() {
   }, { timeout: 1000 });
   exports.activate();
   return {
-    exports, perspective, calls, queued, registry, originalTimestamp,
+    exports, perspective, calls, queued, registry, originalTimestamp, sdk, listeners,
+    notifyRegistry: () => [...listeners].forEach((listener) => listener()),
     render: (thread) => component({ thread }).children[1],
     renderTimestamp: (props) => component(props).children[0],
     setPermissions: (archive, trash) => { canArchive = archive; canTrash = trash; },
@@ -123,4 +132,61 @@ test('empty task result does not queue a false success', () => {
   plugin.setTasks([]);
   click(plugin.render({ id: 'this-row' }).children[0][0]);
   assert.equal(plugin.queued.length, 0);
+});
+
+test('uses fallback without identity and adopts a timestamp registered after activation', () => {
+  const plugin = loadPlugin({ emptyRegistry: true });
+  const fallback = () => null;
+  const props = { thread: { id: 'row' }, fallback };
+  assert.equal(plugin.renderTimestamp(props).type, fallback);
+  const reminderTimestamp = () => null;
+  plugin.registry.push(reminderTimestamp);
+  plugin.notifyRegistry();
+  assert.equal(plugin.registry.length, 1, 'The injected role has a single renderer');
+  assert.equal(plugin.renderTimestamp(props).type, reminderTimestamp);
+  plugin.notifyRegistry();
+  plugin.exports.deactivate();
+  assert.deepEqual(plugin.registry, [reminderTimestamp]);
+  assert.equal(plugin.listeners.size, 0);
+});
+
+test('rows awaiting a registry update remain safe after deactivation', () => {
+  const plugin = loadPlugin();
+  plugin.exports.deactivate();
+  assert.equal(plugin.renderTimestamp({ thread: { id: 'row' } }).type, plugin.originalTimestamp);
+  assert.equal(plugin.render({ id: 'row' }), null);
+  plugin.exports.activate();
+  assert.equal(plugin.registry.length, 1);
+  assert.equal(plugin.listeners.size, 1);
+  plugin.exports.deactivate();
+});
+
+test('empty registry with no fallback stays safe before and after deactivation', () => {
+  const plugin = loadPlugin({ emptyRegistry: true });
+  assert.equal(plugin.renderTimestamp({ thread: { id: 'row' } }), null);
+  plugin.exports.deactivate();
+  assert.equal(plugin.renderTimestamp({ thread: { id: 'row' } }), null);
+  assert.equal(plugin.registry.length, 0);
+});
+
+test('mouse actions keep list focus and only activation keys stop propagation', () => {
+  const plugin = loadPlugin();
+  const button = plugin.render({ id: 'row' }).children[0][0];
+  const mouse = { preventDefault() { this.prevented = true; }, stopPropagation() { this.stopped = true; } };
+  button.props.onMouseDown(mouse);
+  assert.ok(mouse.prevented && mouse.stopped);
+  for (const key of ['Enter', ' ', 'Spacebar', 'ArrowDown', 'a', 'Escape']) {
+    for (const handler of ['onKeyDown', 'onKeyUp']) {
+      const event = { key, stopped: false, stopPropagation() { this.stopped = true; } };
+      button.props[handler](event);
+      assert.equal(event.stopped, ['Enter', ' ', 'Spacebar'].includes(key));
+    }
+  }
+});
+
+test('unregistering an absent component does not remove the timestamp', () => {
+  const plugin = loadPlugin();
+  const before = [...plugin.registry];
+  plugin.sdk.ComponentRegistry.unregister(() => null);
+  assert.deepEqual(plugin.registry, before);
 });

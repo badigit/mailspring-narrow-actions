@@ -3,6 +3,8 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+# A caller using PowerShell 7 may pass its module search path to Windows PowerShell.
+Import-Module (Join-Path $PSHOME 'Modules\Microsoft.PowerShell.Utility\Microsoft.PowerShell.Utility.psd1')
 $pluginName = 'narrow-thread-actions'
 $destination = Join-Path $PackagesPath $pluginName
 $files = @('package.json', 'lib\entry.js', 'lib\main.js', 'styles\main.less')
@@ -19,5 +21,11 @@ foreach ($relative in $files) {
         throw "Installed file differs: $relative"
     }
 }
+$status = @{
+    version = $metadata.version
+    state = 'installed'
+    updatedAt = [DateTime]::UtcNow.ToString('o')
+}
+$status | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $destination 'status.json') -Encoding UTF8
 Write-Output "Installed $pluginName $($metadata.version) into $destination"
 Write-Output 'Reload Mailspring to activate the package.'

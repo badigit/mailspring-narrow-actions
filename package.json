@@ -1,11 +1,11 @@
 {
   "name": "narrow-thread-actions",
   "displayName": "Narrow Thread Actions",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Archive and trash buttons on hover in the narrow thread list.",
   "main": "./lib/entry.js",
   "license": "MIT",
   "engines": { "mailspring": ">=1.26.0" },
   "windowTypes": { "default": true },
-  "scripts": { "test": "node --test --test-timeout=10000 test/actions.test.js" }
+  "scripts": { "test": "node --test --test-timeout=10000 test/*.test.js" }
 }
