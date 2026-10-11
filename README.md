@@ -1,11 +1,11 @@
 # Narrow Thread Actions
 
-Плагин добавляет «Архивировать» и «Удалить» при наведении на письмо в узком списке Mailspring.
-Плагин проверен в Mailspring 1.26.0 для Windows.
+Adds Archive and Trash buttons when you hover over a thread in Mailspring's narrow list.
+Tested on Mailspring 1.26.0 for Windows.
 
-## Установка
+## Installation
 
-Выполните команды в PowerShell:
+Run these commands in PowerShell:
 
 ```powershell
 git clone https://github.com/badigit/mailspring-narrow-actions.git
@@ -13,24 +13,24 @@ Set-Location "mailspring-narrow-actions"
 & ".\install.ps1"
 ```
 
-Перезагрузите окно Mailspring через меню Developer.
-Наведите указатель на письмо в узком списке.
-Справа появятся «Архивировать» и «Удалить», если текущая папка разрешает эти действия.
+Reload the Mailspring window from the Developer menu.
+Hover over a thread in the narrow list.
+Archive and Trash buttons appear on the right when those actions are available in the current folder.
 
-## Если плагин не работает
+## Troubleshooting
 
-Откройте `%APPDATA%\Mailspring\packages\narrow-thread-actions\status.json`.
-Значение `state: active` означает, что плагин загружен.
-При значении `state: failed` поле `error` содержит причину ошибки.
+Open `%APPDATA%\Mailspring\packages\narrow-thread-actions\status.json`.
+The value `state: active` means the plugin has loaded.
+If the value is `state: failed`, the `error` field contains the failure details.
 
-## Отключение
+## Removal
 
-Удалите папку `%APPDATA%\Mailspring\packages\narrow-thread-actions`.
-Перезагрузите окно Mailspring.
+Delete `%APPDATA%\Mailspring\packages\narrow-thread-actions`.
+Reload the Mailspring window.
 
-## Тесты
+## Tests
 
-Выполните команду в папке исходников:
+Run this command from the repository directory:
 
 ```powershell
 npm test
