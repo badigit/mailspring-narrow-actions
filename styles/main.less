@@ -1,0 +1,71 @@
+@import "ui-variables";
+
+.narrow-thread-actions {
+  display: none;
+}
+
+.thread-list.thread-list-narrow .list-item {
+  .narrow-thread-actions {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    z-index: 2;
+    display: flex;
+    gap: 4px;
+    padding: 3px;
+    border: 1px solid @border-color-divider;
+    border-radius: 5px;
+    background: @list-bg;
+    color: @text-color;
+    opacity: 0;
+    pointer-events: none;
+    // Keep hidden controls out of keyboard navigation until the row is hovered.
+    visibility: hidden;
+  }
+
+  &:hover .narrow-thread-actions,
+  &:focus-within .narrow-thread-actions {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  &.selected .narrow-thread-actions {
+    background: @list-selected-bg;
+    color: @list-selected-color;
+  }
+
+  &.focused .narrow-thread-actions {
+    background: @list-focused-bg;
+    color: @list-focused-color;
+  }
+}
+
+.thread-list.thread-list-narrow .narrow-thread-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 28px;
+  margin: 0;
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: 3px;
+  cursor: pointer;
+
+  &:hover {
+    background: fade(@text-color, 14%);
+  }
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: -2px;
+  }
+}
+
+.thread-list.thread-list-narrow.handler-split .list-item.selected .narrow-thread-actions {
+  background: @list-focused-bg;
+  color: @list-focused-color;
+}
