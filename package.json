@@ -1,7 +1,7 @@
 {
   "name": "narrow-thread-actions",
   "displayName": "Narrow Thread Actions",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "Archive and trash buttons on hover in the narrow thread list.",
   "main": "./lib/entry.js",
   "license": "MIT",

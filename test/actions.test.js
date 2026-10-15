@@ -21,6 +21,7 @@ function loadPlugin({ emptyRegistry = false } = {}) {
     canMoveThreadsTo: () => canTrash,
   };
   const sdk = {
+    NativeNotifications: { displayNotification() {} },
     localized: (value) => value,
     ComponentRegistry: {
       findComponentsMatching: () => [...registry],
@@ -56,6 +57,7 @@ function loadPlugin({ emptyRegistry = false } = {}) {
     AppEnv: { getLoadSettings: () => ({ resourcePath: '/running-app/app.asar' }) },
     require: (name) => {
       if (name === 'path') return path;
+      if (name === './notification-trash') return require('../lib/notification-trash');
       if (name === 'module') return { createRequire: () => appRequire };
       throw new Error(`Unexpected external dependency: ${name}`);
     },

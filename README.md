@@ -3,6 +3,10 @@
 Adds Archive and Trash buttons when you hover over a thread in Mailspring's narrow list.
 Tested on Mailspring 1.26.0 for Windows.
 
+Windows notifications for individual messages also include a Delete button.
+It moves the thread to Trash. Mark as Read and Archive remain available.
+Reload Mailspring after updating; the new button appears in subsequent notifications.
+
 ![Archive and Trash buttons on hover in the narrow thread list](docs/images/narrow-thread-actions.png)
 
 ## Installation

@@ -28,7 +28,7 @@ test('installer replaces stale active status and verifies the installed files', 
     assert.equal(status.state, 'installed');
     assert.equal(status.version, require('../package.json').version);
     assert.ok(Date.parse(status.updatedAt) > Date.parse('2000-01-01T00:00:00Z'));
-    for (const relative of ['package.json', 'lib/entry.js', 'lib/main.js', 'styles/main.less']) {
+    for (const relative of ['package.json', 'lib/entry.js', 'lib/main.js', 'lib/notification-trash.js', 'styles/main.less']) {
       assert.deepEqual(fs.readFileSync(path.join(destination, relative)), fs.readFileSync(path.join(repo, relative)));
     }
   } finally {

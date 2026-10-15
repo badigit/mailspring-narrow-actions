@@ -7,7 +7,7 @@ $ErrorActionPreference = 'Stop'
 Import-Module (Join-Path $PSHOME 'Modules\Microsoft.PowerShell.Utility\Microsoft.PowerShell.Utility.psd1')
 $pluginName = 'narrow-thread-actions'
 $destination = Join-Path $PackagesPath $pluginName
-$files = @('package.json', 'lib\entry.js', 'lib\main.js', 'styles\main.less')
+$files = @('package.json', 'lib\entry.js', 'lib\main.js', 'lib\notification-trash.js', 'styles\main.less')
 $metadata = Get-Content -LiteralPath (Join-Path $PSScriptRoot 'package.json') -Raw | ConvertFrom-Json
 if ($metadata.name -ne $pluginName) { throw 'Unexpected package name' }
 
